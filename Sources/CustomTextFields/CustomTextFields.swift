@@ -3,53 +3,6 @@
 
 import SwiftUI
 
-public struct TextFieldConfig {
-    let keyboardType: UIKeyboardType
-    let isSecure: Bool
-    let disableAutocorrection: Bool
-    let autocapitalization: TextInputAutocapitalization
-}
-
-public enum TextFieldType {
-    case email
-    case password
-    case decimal
-    case alphaNumber
-
-    var config: TextFieldConfig {
-        switch self {
-        case .email:
-            return TextFieldConfig(
-                keyboardType: .emailAddress,
-                isSecure: false,
-                disableAutocorrection: true,
-                autocapitalization: .never
-            )
-        case .password:
-            return TextFieldConfig(
-                keyboardType: .asciiCapable,
-                isSecure: true,
-                disableAutocorrection: true,
-                autocapitalization: .never
-            )
-        case .decimal:
-            return TextFieldConfig(
-                keyboardType: .decimalPad,
-                isSecure: false,
-                disableAutocorrection: false,
-                autocapitalization: .sentences
-            )
-        case .alphaNumber:
-            return TextFieldConfig(
-                keyboardType: .asciiCapable,
-                isSecure: false,
-                disableAutocorrection: true,
-                autocapitalization: .words
-            )
-        }
-    }
-}
-
 public struct CustomTextField: View {
     public var header: String?
     public let placeholder: String
@@ -128,7 +81,6 @@ public struct CustomTextField: View {
             if let validator = validator {
                 isValid = validator(input)
             } else {
-                // Validation par défaut selon le type
                 isValid = defaultValidation(for: input)
             }
         }
@@ -137,18 +89,13 @@ public struct CustomTextField: View {
     private func defaultValidation(for input: String) -> Bool {
         switch type {
         case .email:
-            return isValidEmail(input)
+            return Validators.isValidEmail(input)
         case .password:
-            return input.count >= 6
+            return Validators.isStrongPassword(input)
         case .decimal:
             return Double(input) != nil
         default:
             return !input.isEmpty
         }
-    }
-
-    private func isValidEmail(_ email: String) -> Bool {
-        let emailRegex = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
-        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
     }
 }
