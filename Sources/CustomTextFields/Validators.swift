@@ -2,7 +2,7 @@
 //  Validators.swift
 //  CustomTextFields
 //
-//  Created by Julien Cotte on 22/08/2025.
+//  Created by Fenriz1349 on 22/08/2025.
 //
 
 import Foundation
@@ -26,4 +26,5 @@ public enum Validators {
     public static func isStrongPassword(_ password: String) -> Bool {
         let passwordRegex = #"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$"#
         return NSPredicate(format: "SELF MATCHES %@", passwordRegex).evaluate(with: password)
-    }}
+    }
+}

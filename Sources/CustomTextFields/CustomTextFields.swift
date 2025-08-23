@@ -3,6 +3,8 @@
 
 import SwiftUI
 
+/// A customizable SwiftUI text field with built-in validation.
+/// Supports email, password (with strong validation), decimal, and alphanumeric input types.
 public struct CustomTextField: View {
     public var header: String?
     public let placeholder: String
