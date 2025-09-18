@@ -27,4 +27,9 @@ public enum Validators {
         let passwordRegex = #"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$"#
         return NSPredicate(format: "SELF MATCHES %@", passwordRegex).evaluate(with: password)
     }
+
+    public static func isLettersOnly(_ text: String) -> Bool {
+        let lettersRegex = "^[a-zA-ZÀ-ÿ\\s-']+$"
+        return NSPredicate(format: "SELF MATCHES %@", lettersRegex).evaluate(with: text)
+    }
 }

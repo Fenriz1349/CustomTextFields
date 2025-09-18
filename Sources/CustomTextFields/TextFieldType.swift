@@ -19,6 +19,8 @@ public enum TextFieldType {
     case password
     case decimal
     case alphaNumber
+    case lettersOnly
+    case number
 
     var config: TextFieldConfig {
         switch self {
@@ -49,6 +51,20 @@ public enum TextFieldType {
                 isSecure: false,
                 disableAutocorrection: true,
                 autocapitalization: .words
+            )
+        case .lettersOnly:
+            return TextFieldConfig(
+                keyboardType: .default,
+                isSecure: false,
+                disableAutocorrection: false,
+                autocapitalization: .words
+            )
+        case .number:
+            return TextFieldConfig(
+                keyboardType: .numberPad,
+                isSecure: false,
+                disableAutocorrection: true,
+                autocapitalization: .never
             )
         }
     }
