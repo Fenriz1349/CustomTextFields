@@ -3,9 +3,10 @@
 
 import SwiftUI
 
-/// A customizable SwiftUI text field with built-in validation.
-/// Supports email, password (with strong validation), decimal, and alphanumeric input types.
+/// A customizable SwiftUI text field with built-in validation and flexible color scheme.
+/// Supports email, password, decimal, and alphanumeric input types with custom validation.
 public struct CustomTextField: View {
+    // MARK: - Public Properties
     public var header: String?
     public let placeholder: String
     @Binding public var text: String
@@ -13,15 +14,26 @@ public struct CustomTextField: View {
     public var validator: ((String) -> Bool)?
     public var errorMessage: String?
 
-    @State private var isValid: Bool = true
+    // Validation configuration
+    @Binding public var validationState: ValidationState
+    public let colors: ValidationColors
+    public let showErrorOnlyWhenTriggered: Bool
 
+    // MARK: - Private State
+    @State private var isValid: Bool = true
+    @FocusState private var isFocused: Bool
+
+    // MARK: - Initializer
     public init(
         header: String? = nil,
         placeholder: String,
         text: Binding<String>,
         type: TextFieldType,
         validator: ((String) -> Bool)? = nil,
-        errorMessage: String? = nil
+        errorMessage: String? = nil,
+        validationState: Binding<ValidationState> = .constant(.neutral),
+        colors: ValidationColors = .default,
+        showErrorOnlyWhenTriggered: Bool = true
     ) {
         self.header = header
         self.placeholder = placeholder
@@ -29,62 +41,119 @@ public struct CustomTextField: View {
         self.type = type
         self.validator = validator
         self.errorMessage = errorMessage
+        self._validationState = validationState
+        self.colors = colors
+        self.showErrorOnlyWhenTriggered = showErrorOnlyWhenTriggered
     }
 
+    // MARK: - Body
     public var body: some View {
         let config = type.config
 
         VStack(alignment: .leading, spacing: 5) {
-            if let header = header {
-                Text(header)
-                    .font(.headline)
-            }
-
-            Group {
-                if config.isSecure {
-                    SecureField(placeholder, text: $text)
-                } else {
-                    TextField(placeholder, text: $text)
-                }
-            }
-            .padding()
-            .background(Color(.systemBackground))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(borderColor.opacity(0.3), lineWidth: 2)
-            )
-            .cornerRadius(8)
-            .shadow(color: .primary.opacity(0.3), radius: 4, x: 1, y: 2)
-            .keyboardType(config.keyboardType)
-            .autocorrectionDisabled(config.disableAutocorrection)
-            .textInputAutocapitalization(config.autocapitalization)
-            .onChange(of: text) { newValue in
-                validateInput(newValue)
-            }
-
-            if !isValid, let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .font(.caption)
-                    .foregroundColor(.red)
-                    .transition(.opacity)
-            }
+            headerView
+            
+            textFieldView(config: config)
+            
+            errorMessageView
         }
     }
 
+    // MARK: - View Components
+    @ViewBuilder
+    private var headerView: some View {
+        if let header = header {
+            Text(header)
+                .font(.headline)
+        }
+    }
+
+    private func textFieldView(config: TextFieldConfig) -> some View {
+        Group {
+            if config.isSecure {
+                SecureField(placeholder, text: $text)
+            } else {
+                TextField(placeholder, text: $text)
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(borderColor, lineWidth: 2)
+        )
+        .cornerRadius(8)
+        .shadow(color: .primary.opacity(0.3), radius: 4, x: 1, y: 2)
+        .keyboardType(config.keyboardType)
+        .autocorrectionDisabled(config.disableAutocorrection)
+        .textInputAutocapitalization(config.autocapitalization)
+        .focused($isFocused)
+        .onChange(of: text) { newValue in
+            validateInput(newValue)
+        }
+        .onChange(of: isFocused) { focused in
+            updateValidationState()
+        }
+    }
+
+    @ViewBuilder
+    private var errorMessageView: some View {
+        if shouldShowError, let errorMessage = errorMessage {
+            Text(errorMessage)
+                .font(.caption)
+                .foregroundColor(colors.invalid)
+                .transition(.opacity)
+        }
+    }
+
+    // MARK: - Computed Properties
     private var borderColor: Color {
-        if text.isEmpty {
-            return Color.gray
+        if isFocused {
+            return colors.focused
         }
-        return isValid ? Color.green : Color.red
+
+        return colors.color(for: validationState).opacity(validationState == .neutral ? 0.5 : 1.0)
     }
 
+    private var shouldShowError: Bool {
+        if showErrorOnlyWhenTriggered {
+            return validationState == .invalid && !text.isEmpty
+        } else {
+            return !isValid && !text.isEmpty
+        }
+    }
+
+    // MARK: - Private Methods
     private func validateInput(_ input: String) {
         withAnimation(.easeInOut(duration: 0.2)) {
-            if let validator = validator {
-                isValid = validator(input)
-            } else {
-                isValid = defaultValidation(for: input)
-            }
+            isValid = performValidation(for: input)
+            updateValidationState()
+        }
+    }
+
+    private func performValidation(for input: String) -> Bool {
+        if let customValidator = validator {
+            return customValidator(input)
+        }
+        return defaultValidation(for: input)
+    }
+
+    private func updateValidationState() {
+        // Don't override invalid state if showErrorOnlyWhenTriggered is true
+        if showErrorOnlyWhenTriggered && validationState == .invalid {
+            return
+        }
+
+        if isFocused {
+            validationState = .focused
+        } else if text.isEmpty {
+            validationState = .neutral
+        } else if isValid {
+            validationState = .valid
+        } else if !showErrorOnlyWhenTriggered {
+            validationState = .invalid
+        } else {
+            validationState = .neutral
         }
     }
 
@@ -96,8 +165,12 @@ public struct CustomTextField: View {
             return Validators.isStrongPassword(input)
         case .decimal:
             return Double(input) != nil
-        default:
-            return !input.isEmpty
+        case .lettersOnly:
+            return Validators.isLettersOnly(input)
+        case .number:
+            return Int(input) != nil
+        case .alphaNumber:
+            return !input.isEmpty && input.allSatisfy { $0.isLetter || $0.isNumber || $0.isWhitespace }
         }
     }
 }

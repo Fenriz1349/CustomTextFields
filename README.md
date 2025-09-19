@@ -1,15 +1,17 @@
 # CustomTextField
 
-A powerful and customizable SwiftUI text field component with built-in validation, beautiful styling, and comprehensive input type support.
+A powerful and customizable SwiftUI text field component with advanced validation states, flexible styling, and comprehensive input type support.
 
 ## Features
 
 - 🎨 **Beautiful Design**: Pre-styled with shadows, borders, and smooth animations
-- ✅ **Built-in Validation**: Email, password strength, decimal, and custom validation support
-- 🔐 **Security**: Secure text entry for passwords with strong validation
+- ✅ **Advanced Validation**: Multiple validation modes with visual state management
+- 🎭 **Dynamic Visual Feedback**: Smart border colors based on validation state
+- 🔐 **Security**: Secure text entry for passwords with configurable strength validation
 - ⌨️ **Smart Keyboard**: Automatic keyboard type selection based on input type
-- 🎭 **Visual Feedback**: Dynamic border colors and error messages
-- 🔄 **Real-time Validation**: Instant feedback as users type
+- 🎨 **Customizable Colors**: Full color scheme customization for all validation states
+- 🔄 **Flexible Validation Timing**: Choose between immediate or triggered validation
+- 📋 **Pre-built Components**: Ready-to-use field types for common use cases
 - 📱 **Native SwiftUI**: Fully compatible with SwiftUI and iOS design patterns
 
 ## Installation
@@ -27,11 +29,11 @@ Or add it to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/CustomTextField", from: "1.0.0")
+    .package(url: "https://github.com/yourusername/CustomTextField", from: "1.1.0")
 ]
 ```
 
-## Usage
+## Quick Start
 
 ### Basic Example
 
@@ -41,179 +43,203 @@ import CustomTextField
 
 struct ContentView: View {
     @State private var email = ""
-    @State private var password = ""
-    @State private var amount = ""
+    @State private var firstName = ""
+    @State private var emailState: ValidationState = .neutral
     
     var body: some View {
         VStack(spacing: 20) {
-            CustomTextField(
-                header: "Email Address",
-                placeholder: "Enter your email",
+            // Pre-configured email field
+            CustomTextField.emailField(
                 text: $email,
-                type: .email,
-                errorMessage: "Please enter a valid email address"
+                validationState: $emailState
             )
             
-            CustomTextField(
-                header: "Password",
-                placeholder: "Enter your password",
-                text: $password,
-                type: .password,
-                errorMessage: "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
+            // Pre-configured name field  
+            CustomTextField.nameField(
+                placeholder: "First Name",
+                text: $firstName
             )
             
-            CustomTextField(
-                header: "Amount",
-                placeholder: "0.00",
-                text: $amount,
-                type: .decimal,
-                errorMessage: "Please enter a valid number"
-            )
+            Button("Submit") {
+                if !Validators.isValidEmail(email) {
+                    emailState = .invalid
+                }
+            }
         }
         .padding()
     }
 }
 ```
 
-### Advanced Usage with Custom Validation
+## Validation Modes
+
+### 1. Triggered Validation (Recommended)
+
+Shows validation errors only when manually triggered (e.g., form submission):
 
 ```swift
-CustomTextField(
-    header: "Username",
-    placeholder: "Enter username",
-    text: $username,
-    type: .alphaNumber,
-    validator: { input in
-        return input.count >= 3 && input.count <= 20
-    },
-    errorMessage: "Username must be between 3-20 characters"
+@State private var email = ""
+@State private var emailState: ValidationState = .neutral
+
+CustomTextField.triggered(
+    placeholder: "Email",
+    text: $email,
+    type: .email,
+    errorMessage: "Please enter a valid email",
+    validationState: $emailState
+)
+
+// Trigger validation on button click
+Button("Submit") {
+    if !Validators.isValidEmail(email) {
+        emailState = .invalid
+    }
+}
+```
+
+### 2. Immediate Validation
+
+Shows validation feedback as soon as user types:
+
+```swift
+CustomTextField.immediate(
+    placeholder: "Password",
+    text: $password,
+    type: .password,
+    errorMessage: "Password requirements not met"
+)
+```
+
+## Validation States
+
+The component supports four distinct validation states:
+
+| State | Description | Default Color | Usage |
+|-------|-------------|---------------|-------|
+| `.neutral` | Default state, no validation shown | Gray | Empty fields or before validation |
+| `.valid` | Input passes validation | Green | Valid input confirmed |
+| `.invalid` | Input fails validation | Red | Show errors to user |
+| `.focused` | User is currently typing | Blue | Active input focus |
+
+## Custom Color Schemes
+
+### Pre-defined Schemes
+
+```swift
+// Default colors
+CustomTextField(/* ... */, colors: .default)
+
+// iOS system colors
+CustomTextField(/* ... */, colors: .system)
+
+// Custom mint scheme
+CustomTextField(/* ... */, colors: .mint)
+```
+
+### Custom Color Scheme
+
+```swift
+let customColors = ValidationColors(
+    neutral: .gray,
+    valid: Color.green.opacity(0.8),
+    invalid: Color.red.opacity(0.9),
+    focused: Color.blue.opacity(0.7)
+)
+
+CustomTextField.triggered(
+    placeholder: "Custom Field",
+    text: $text,
+    type: .email,
+    validationState: $state,
+    colors: customColors
 )
 ```
 
 ## Text Field Types
 
-CustomTextField supports four built-in input types:
+| Type | Keyboard | Validation | Features |
+|------|----------|------------|----------|
+| `.email` | Email layout | Email format | No auto-correction, no caps |
+| `.password` | ASCII capable | Strong password rules | Secure entry, no auto-correction |
+| `.decimal` | Decimal pad | Valid number | Numeric input optimized |
+| `.alphaNumber` | ASCII capable | Non-empty | Word caps, no auto-correction |
+| `.lettersOnly` | Default | Letters, spaces, hyphens | Word caps, letters validation |
+| `.number` | Number pad | Integer validation | Number input only |
 
-### `.email`
-- **Keyboard**: Email keyboard layout
-- **Validation**: Standard email format validation
-- **Features**: Auto-correction disabled, no capitalization
+## Pre-built Components
 
-### `.password`
-- **Keyboard**: ASCII capable keyboard
-- **Validation**: Strong password requirements:
-  - Minimum 8 characters
-  - At least one uppercase letter
-  - At least one lowercase letter
-  - At least one digit
-  - At least one special character (`!@#$%^&*(),.?":{}|<>`)
-- **Features**: Secure text entry, auto-correction disabled
+For common use cases, use the convenient pre-built components:
 
-### `.decimal`
-- **Keyboard**: Decimal pad
-- **Validation**: Valid decimal number
-- **Features**: Optimized for numeric input
-
-### `.alphaNumber`
-- **Keyboard**: ASCII capable keyboard
-- **Validation**: Non-empty string
-- **Features**: Word capitalization, auto-correction disabled
-
-## Customization Options
-
-### Parameters
-
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|---------|
-| `header` | `String?` | Optional header text above the field | `nil` |
-| `placeholder` | `String` | Placeholder text shown when field is empty | Required |
-| `text` | `Binding<String>` | Binding to the text value | Required |
-| `type` | `TextFieldType` | Input type configuration | Required |
-| `validator` | `((String) -> Bool)?` | Custom validation function | `nil` |
-| `errorMessage` | `String?` | Error message shown on validation failure | `nil` |
-
-### Visual States
-
-The text field automatically adapts its appearance based on the current state:
-
-- **Empty**: Gray border
-- **Valid Input**: Green border
-- **Invalid Input**: Red border with error message
-- **Focus**: Subtle shadow and smooth transitions
-
-## Validation
-
-### Built-in Validators
-
-The package includes a `Validators` utility class with pre-built validation functions:
-
+### Name Field
 ```swift
-// Email validation
-Validators.isValidEmail("user@example.com") // Returns Bool
-
-// Strong password validation
-Validators.isStrongPassword("MyPass123!") // Returns Bool
-```
-
-### Custom Validation
-
-You can provide your own validation logic:
-
-```swift
-CustomTextField(
-    placeholder: "Product Code",
-    text: $productCode,
-    type: .alphaNumber,
-    validator: { code in
-        // Custom validation: must start with "PRD" and be 8 characters
-        return code.hasPrefix("PRD") && code.count == 8
-    },
-    errorMessage: "Product code must start with 'PRD' and be 8 characters long"
+CustomTextField.nameField(
+    placeholder: "First Name", // Optional, defaults to "Name"
+    text: $firstName,
+    validationState: $firstNameState,
+    colors: .mint // Optional custom colors
 )
 ```
 
-## Examples
-
-### Login Form
-
+### Email Field
 ```swift
-struct LoginView: View {
-    @State private var email = ""
-    @State private var password = ""
-    
-    var body: some View {
-        VStack(spacing: 25) {
-            Text("Welcome Back")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            
-            CustomTextField(
-                header: "Email",
-                placeholder: "your@email.com",
-                text: $email,
-                type: .email,
-                errorMessage: "Please enter a valid email"
-            )
-            
-            CustomTextField(
-                header: "Password",
-                placeholder: "Your password",
-                text: $password,
-                type: .password,
-                errorMessage: "Password requirements not met"
-            )
-            
-            Button("Sign In") {
-                // Handle login
-            }
-            .disabled(email.isEmpty || password.isEmpty)
-        }
-        .padding()
-    }
-}
+CustomTextField.emailField(
+    text: $email,
+    validationState: $emailState
+)
 ```
 
-### Registration Form
+### Password Field
+```swift
+CustomTextField.passwordField(
+    text: $password,
+    validationState: $passwordState
+)
+```
+
+## Advanced Validation
+
+### Custom Validation Rules
+
+```swift
+// Using the example validation rules
+CustomTextField.triggered(
+    placeholder: "Username",
+    text: $username,
+    type: .alphaNumber,
+    validator: ExampleValidationRules.validateUsername,
+    errorMessage: "Username must be 3-20 characters, alphanumeric only",
+    validationState: $usernameState
+)
+
+// Combining multiple validators
+let strongNameValidator = ExampleValidationRules.allOf([
+    ExampleValidationRules.validateFirstName,
+    ExampleValidationRules.minimumLength(2),
+    ExampleValidationRules.maximumLength(30)
+])
+```
+
+### Built-in Validators
+
+The package includes comprehensive validation utilities:
+
+```swift
+// Email validation
+Validators.isValidEmail("user@example.com")
+
+// Strong password (8+ chars, uppercase, lowercase, number, special char)
+Validators.isStrongPassword("MyPass123!")
+
+// Letters only (with spaces, hyphens, apostrophes)
+Validators.isLettersOnly("Jean-Pierre O'Connor")
+
+// Example validation rules
+ExampleValidationRules.validateFirstName("John")
+ExampleValidationRules.validateUSPhoneNumber("(555) 123-4567")
+ExampleValidationRules.validateAge("25")
+```
+
+## Complete Form Example
 
 ```swift
 struct RegistrationView: View {
@@ -221,66 +247,111 @@ struct RegistrationView: View {
     @State private var lastName = ""
     @State private var email = ""
     @State private var password = ""
-    @State private var confirmPassword = ""
+    
+    @State private var firstNameState: ValidationState = .neutral
+    @State private var lastNameState: ValidationState = .neutral
+    @State private var emailState: ValidationState = .neutral
+    @State private var passwordState: ValidationState = .neutral
+    
+    // Custom color scheme
+    let customColors = ValidationColors.mint
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                CustomTextField(
-                    header: "First Name",
-                    placeholder: "John",
-                    text: $firstName,
-                    type: .alphaNumber,
-                    errorMessage: "First name is required"
-                )
+        NavigationView {
+            Form {
+                Section("Personal Information") {
+                    CustomTextField.nameField(
+                        placeholder: "First Name",
+                        text: $firstName,
+                        validationState: $firstNameState,
+                        colors: customColors
+                    )
+                    
+                    CustomTextField.nameField(
+                        placeholder: "Last Name",
+                        text: $lastName,
+                        validationState: $lastNameState,
+                        colors: customColors
+                    )
+                }
                 
-                CustomTextField(
-                    header: "Last Name",
-                    placeholder: "Doe",
-                    text: $lastName,
-                    type: .alphaNumber,
-                    errorMessage: "Last name is required"
-                )
+                Section("Account") {
+                    CustomTextField.emailField(
+                        text: $email,
+                        validationState: $emailState,
+                        colors: customColors
+                    )
+                    
+                    CustomTextField.passwordField(
+                        text: $password,
+                        validationState: $passwordState,
+                        colors: customColors
+                    )
+                }
                 
-                CustomTextField(
-                    header: "Email",
-                    placeholder: "john.doe@example.com",
-                    text: $email,
-                    type: .email,
-                    errorMessage: "Please enter a valid email"
-                )
-                
-                CustomTextField(
-                    header: "Password",
-                    placeholder: "Create a strong password",
-                    text: $password,
-                    type: .password,
-                    errorMessage: "Password must meet security requirements"
-                )
-                
-                CustomTextField(
-                    header: "Confirm Password",
-                    placeholder: "Confirm your password",
-                    text: $confirmPassword,
-                    type: .password,
-                    validator: { input in
-                        return input == password
-                    },
-                    errorMessage: "Passwords don't match"
-                )
+                Section {
+                    Button("Create Account") {
+                        validateAndSubmit()
+                    }
+                    .disabled(!isFormValid)
+                }
             }
-            .padding()
+            .navigationTitle("Sign Up")
+        }
+    }
+    
+    private var isFormValid: Bool {
+        ExampleValidationRules.validateFirstName(firstName) &&
+        ExampleValidationRules.validateFirstName(lastName) &&
+        Validators.isValidEmail(email) &&
+        Validators.isStrongPassword(password)
+    }
+    
+    private func validateAndSubmit() {
+        var hasErrors = false
+        
+        if !ExampleValidationRules.validateFirstName(firstName) {
+            firstNameState = .invalid
+            hasErrors = true
+        }
+        
+        if !ExampleValidationRules.validateFirstName(lastName) {
+            lastNameState = .invalid
+            hasErrors = true
+        }
+        
+        if !Validators.isValidEmail(email) {
+            emailState = .invalid
+            hasErrors = true
+        }
+        
+        if !Validators.isStrongPassword(password) {
+            passwordState = .invalid
+            hasErrors = true
+        }
+        
+        if !hasErrors {
+            // Submit form
+            print("Form submitted successfully!")
         }
     }
 }
 ```
 
+## Validation Helper Methods
+
+```swift
+// Trigger error state
+CustomTextField.triggerError(for: $emailState)
+
+// Reset to neutral state
+CustomTextField.resetValidation(for: $emailState)
+```
+
 ## Requirements
 
-- iOS 14.0+
-- macOS 11.0+
-- tvOS 14.0+
-- watchOS 7.0+
+- iOS 15.0+
+- macOS 12.0+
 - Swift 5.5+
 - Xcode 13.0+
 
@@ -293,8 +364,21 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 1. Clone the repository
 2. Open `Package.swift` in Xcode
 3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+4. Run tests with `⌘+U`
+5. Add tests for new functionality
+6. Submit a pull request
+
+## Testing
+
+The package includes comprehensive unit tests:
+
+```bash
+# Run all tests
+swift test
+
+# Run specific test file
+swift test --filter CustomTextFieldTests
+```
 
 ## License
 
@@ -306,11 +390,24 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
+### Version 1.1.0 ✨
+- **NEW**: Advanced validation state management with `.neutral`, `.valid`, `.invalid`, and `.focused` states
+- **NEW**: Customizable color schemes for all validation states
+- **NEW**: Pre-built components: `nameField()`, `emailField()`, `passwordField()`
+- **NEW**: Two validation modes: immediate and triggered validation
+- **NEW**: Comprehensive example validation rules in `ExampleValidationRules`
+- **NEW**: Helper methods for managing validation states
+- **NEW**: Complete unit test suite
+- **IMPROVED**: Better code organization with separated files
+- **IMPROVED**: Enhanced documentation with real-world examples
+- **BREAKING**: API changes for better flexibility (see migration guide)
+
 ### Version 1.0.0
 - Initial release
 - Support for email, password, decimal, and alphanumeric input types
 - Built-in validation with custom validator support
 - Beautiful default styling with animations
-- Comprehensive documentation and examples
 
 ---
+
+*Made with ❤️ for the SwiftUI community*
