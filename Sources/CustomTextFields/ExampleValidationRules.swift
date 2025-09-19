@@ -166,7 +166,7 @@ public enum ExampleValidationRules {
     // MARK: - Real-world Examples
     
     /// Validates a complete registration form first name
-    public static let registrationFirstName = allOf([
+    @MainActor public static let registrationFirstName = allOf([
         validateFirstName,
         minimumLength(2),
         maximumLength(30)
