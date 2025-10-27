@@ -24,6 +24,11 @@ public enum ValidationState: CaseIterable, Equatable {
         case .focused: return "Focused"
         }
     }
+
+    /// Direct access to border color
+    public var borderColor: Color {
+        ValidationColors.default.color(for: self)
+    }
 }
 
 /// Configuration for validation colors used in CustomTextField
