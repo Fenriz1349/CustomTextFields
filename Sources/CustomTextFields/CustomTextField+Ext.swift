@@ -21,12 +21,12 @@ public extension CustomTextField {
     ///   - colors: Custom color scheme (uses default if not provided)
     /// - Returns: CustomTextField configured for immediate validation
     static func immediate(
-        header: String? = nil,
-        placeholder: String,
+        header: LocalizedStringKey? = nil,
+        placeholder: LocalizedStringKey,
         text: Binding<String>,
         type: TextFieldType,
         validator: ((String) -> Bool)? = nil,
-        errorMessage: String? = nil,
+        errorMessage: LocalizedStringKey? = nil,
         colors: ValidationColors = .default
     ) -> CustomTextField {
         return CustomTextField(
@@ -54,12 +54,12 @@ public extension CustomTextField {
     ///   - colors: Custom color scheme (uses default if not provided)
     /// - Returns: CustomTextField configured for triggered validation
     static func triggered(
-        header: String? = nil,
-        placeholder: String,
+        header: LocalizedStringKey? = nil,
+        placeholder: LocalizedStringKey,
         text: Binding<String>,
         type: TextFieldType,
         validator: ((String) -> Bool)? = nil,
-        errorMessage: String? = nil,
+        errorMessage: LocalizedStringKey? = nil,
         validationState: Binding<ValidationState>,
         colors: ValidationColors = .default
     ) -> CustomTextField {
@@ -104,7 +104,7 @@ public extension CustomTextField {
     ///   - colors: Custom colors
     /// - Returns: Configured CustomTextField for names
     static func nameField(
-        placeholder: String = "Name",
+        placeholder: LocalizedStringKey = "firstName",
         text: Binding<String>,
         validationState: Binding<ValidationState> = .constant(.neutral),
         colors: ValidationColors = .default
@@ -114,7 +114,7 @@ public extension CustomTextField {
             text: text,
             type: .lettersOnly,
             validator: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty },
-            errorMessage: "Please enter a valid name",
+            errorMessage: "validation.name.invalid",
             validationState: validationState,
             colors: colors
         )
@@ -132,10 +132,10 @@ public extension CustomTextField {
         colors: ValidationColors = .default
     ) -> CustomTextField {
         return CustomTextField.triggered(
-            placeholder: "Email",
+            placeholder: "email",
             text: text,
             type: .email,
-            errorMessage: "Please enter a valid email address",
+            errorMessage: "validation.email.invalid",
             validationState: validationState,
             colors: colors
         )
@@ -153,10 +153,10 @@ public extension CustomTextField {
         colors: ValidationColors = .default
     ) -> CustomTextField {
         return CustomTextField.triggered(
-            placeholder: "Password",
+            placeholder: "password",
             text: text,
             type: .password,
-            errorMessage: "Password must contain 8+ characters, uppercase, number, and special character",
+            errorMessage: "validation.password.requirements",
             validationState: validationState,
             colors: colors
         )
