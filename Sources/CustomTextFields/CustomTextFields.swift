@@ -7,12 +7,12 @@ import SwiftUI
 /// Supports email, password, decimal, and alphanumeric input types with custom validation.
 public struct CustomTextField: View {
     // MARK: - Public Properties
-    public var header: LocalizedStringKey?
-    public let placeholder: LocalizedStringKey
+    public var header: String?
+    public let placeholder: String
     @Binding public var text: String
     public let type: TextFieldType
     public var validator: ((String) -> Bool)?
-    public var errorMessage: LocalizedStringKey?
+    public var errorMessage: String?
 
     // Validation configuration
     @Binding public var validationState: ValidationState
@@ -25,12 +25,12 @@ public struct CustomTextField: View {
 
     // MARK: - Initializer
     public init(
-        header: LocalizedStringKey? = nil,
-        placeholder: LocalizedStringKey,
+        header: String? = nil,
+        placeholder: String,
         text: Binding<String>,
         type: TextFieldType,
         validator: ((String) -> Bool)? = nil,
-        errorMessage: LocalizedStringKey? = nil,
+        errorMessage: String? = nil,
         validationState: Binding<ValidationState> = .constant(.neutral),
         colors: ValidationColors = .default,
         showErrorOnlyWhenTriggered: Bool = true

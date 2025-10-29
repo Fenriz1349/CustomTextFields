@@ -21,12 +21,12 @@ public extension CustomTextField {
     ///   - colors: Custom color scheme (uses default if not provided)
     /// - Returns: CustomTextField configured for immediate validation
     static func immediate(
-        header: LocalizedStringKey? = nil,
-        placeholder: LocalizedStringKey,
+        header: String? = nil,
+        placeholder: String,
         text: Binding<String>,
         type: TextFieldType,
         validator: ((String) -> Bool)? = nil,
-        errorMessage: LocalizedStringKey? = nil,
+        errorMessage: String? = nil,
         colors: ValidationColors = .default
     ) -> CustomTextField {
         return CustomTextField(
@@ -54,12 +54,12 @@ public extension CustomTextField {
     ///   - colors: Custom color scheme (uses default if not provided)
     /// - Returns: CustomTextField configured for triggered validation
     static func triggered(
-        header: LocalizedStringKey? = nil,
-        placeholder: LocalizedStringKey,
+        header: String? = nil,
+        placeholder: String,
         text: Binding<String>,
         type: TextFieldType,
         validator: ((String) -> Bool)? = nil,
-        errorMessage: LocalizedStringKey? = nil,
+        errorMessage: String? = nil,
         validationState: Binding<ValidationState>,
         colors: ValidationColors = .default
     ) -> CustomTextField {
@@ -104,7 +104,7 @@ public extension CustomTextField {
     ///   - colors: Custom colors
     /// - Returns: Configured CustomTextField for names
     static func nameField(
-        placeholder: LocalizedStringKey = "firstName",
+        placeholder: String = "firstName",
         text: Binding<String>,
         validationState: Binding<ValidationState> = .constant(.neutral),
         colors: ValidationColors = .default
