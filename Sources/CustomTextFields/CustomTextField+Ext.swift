@@ -104,7 +104,7 @@ public extension CustomTextField {
     ///   - colors: Custom colors
     /// - Returns: Configured CustomTextField for names
     static func nameField(
-        placeholder: String = "firstName",
+        placeholder: String = "Name",
         text: Binding<String>,
         validationState: Binding<ValidationState> = .constant(.neutral),
         colors: ValidationColors = .default
@@ -132,7 +132,7 @@ public extension CustomTextField {
         colors: ValidationColors = .default
     ) -> CustomTextField {
         return CustomTextField.triggered(
-            placeholder: "email",
+            placeholder: "Email",
             text: text,
             type: .email,
             errorMessage: "validation.email.invalid",
@@ -153,7 +153,7 @@ public extension CustomTextField {
         colors: ValidationColors = .default
     ) -> CustomTextField {
         return CustomTextField.triggered(
-            placeholder: "password",
+            placeholder: "Password",
             text: text,
             type: .password,
             errorMessage: "validation.password.requirements",

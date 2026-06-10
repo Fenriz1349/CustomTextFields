@@ -213,9 +213,28 @@ final class CustomTextFieldTests: XCTestCase {
             text: textBinding,
             type: .email
         )
-        
-        // Empty text should not trigger validation errors in most cases
+
         XCTAssertEqual(textValue, "")
+    }
+
+    @MainActor func testEmptyInvalidFieldShowsError() {
+        textValue = ""
+        validationStateValue = .invalid
+        let errorMsg = "This field is required"
+
+        let textField = CustomTextField(
+            placeholder: "Email",
+            text: textBinding,
+            type: .email,
+            errorMessage: errorMsg,
+            validationState: validationStateBinding,
+            showErrorOnlyWhenTriggered: true
+        )
+
+        XCTAssertTrue(textValue.isEmpty)
+        XCTAssertEqual(validationStateValue, .invalid)
+        XCTAssertEqual(textField.errorMessage, errorMsg)
+        XCTAssertTrue(textField.showErrorOnlyWhenTriggered)
     }
     
     @MainActor func testNilValidatorHandling() {
