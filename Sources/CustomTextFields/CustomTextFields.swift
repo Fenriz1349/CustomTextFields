@@ -179,16 +179,16 @@ public struct CustomTextField: View {
     /// Updates the validation state based on focus, trigger status, and validation result.
     /// Prioritizes: focused → untouched → invalid → valid → neutral
     private func updateValidationState() {
+        isValid = performValidation(for: text)
+
         if isFocused {
             validationState = .focused
         } else if !isTriggered {
             validationState = .neutral
-        } else if !isValid {
-            validationState = .invalid
         } else if isValid {
             validationState = .valid
         } else {
-            validationState = .neutral
+            validationState = .invalid
         }
     }
 
