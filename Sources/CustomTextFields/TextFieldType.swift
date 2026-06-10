@@ -12,6 +12,7 @@ public struct TextFieldConfig {
     let isSecure: Bool
     let disableAutocorrection: Bool
     let autocapitalization: TextInputAutocapitalization
+    let textContentType: UITextContentType?
 }
 
 public enum TextFieldType {
@@ -29,42 +30,48 @@ public enum TextFieldType {
                 keyboardType: .emailAddress,
                 isSecure: false,
                 disableAutocorrection: true,
-                autocapitalization: .never
+                autocapitalization: .never,
+                textContentType: .emailAddress
             )
         case .password:
             return TextFieldConfig(
                 keyboardType: .asciiCapable,
                 isSecure: true,
                 disableAutocorrection: true,
-                autocapitalization: .never
+                autocapitalization: .never,
+                textContentType: .password
             )
         case .decimal:
             return TextFieldConfig(
                 keyboardType: .decimalPad,
                 isSecure: false,
                 disableAutocorrection: false,
-                autocapitalization: .sentences
+                autocapitalization: .sentences,
+                textContentType: nil
             )
         case .alphaNumber:
             return TextFieldConfig(
                 keyboardType: .asciiCapable,
                 isSecure: false,
                 disableAutocorrection: true,
-                autocapitalization: .words
+                autocapitalization: .words,
+                textContentType: nil
             )
         case .lettersOnly:
             return TextFieldConfig(
                 keyboardType: .default,
                 isSecure: false,
                 disableAutocorrection: false,
-                autocapitalization: .words
+                autocapitalization: .words,
+                textContentType: nil
             )
         case .number:
             return TextFieldConfig(
                 keyboardType: .numberPad,
                 isSecure: false,
                 disableAutocorrection: true,
-                autocapitalization: .never
+                autocapitalization: .never,
+                textContentType: nil
             )
         }
     }

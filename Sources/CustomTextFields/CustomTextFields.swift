@@ -7,20 +7,30 @@ import SwiftUI
 /// Supports email, password, decimal, and alphanumeric input types with custom validation.
 public struct CustomTextField: View {
     // MARK: - Public Properties
+    /// Optional header text displayed above the text field
     public var header: String?
+    /// Placeholder text shown when the field is empty
     public let placeholder: String
+    /// The text binding for this field
     @Binding public var text: String
+    /// The type of text field (email, password, etc.)
     public let type: TextFieldType
+    /// Optional custom validation closure
     public var validator: ((String) -> Bool)?
+    /// Error message displayed when validation fails
     public var errorMessage: String?
 
     // Validation configuration
+    /// The current validation state of this field
     @Binding public var validationState: ValidationState
+    /// Color scheme for validation states
     public let colors: ValidationColors
+    /// Whether errors are shown only after user interaction
     public let showErrorOnlyWhenTriggered: Bool
 
     // MARK: - Private State
     @State private var isValid: Bool = true
+    @State private var isTriggered: Bool = false
     @FocusState private var isFocused: Bool
 
     // MARK: - Initializer
@@ -72,8 +82,10 @@ public struct CustomTextField: View {
         Group {
             if config.isSecure {
                 SecureField(placeholder, text: $text)
+                    .textContentType(config.textContentType)
             } else {
                 TextField(placeholder, text: $text)
+                    .textContentType(config.textContentType)
             }
         }
         .padding()
@@ -88,10 +100,13 @@ public struct CustomTextField: View {
         .autocorrectionDisabled(config.disableAutocorrection)
         .textInputAutocapitalization(config.autocapitalization)
         .focused($isFocused)
-        .onChange(of: text) { newValue in
+        .onChange(of: text) { _, newValue in
             validateInput(newValue)
         }
-        .onChange(of: isFocused) { focused in
+        .onChange(of: isFocused) { _, focused in
+            if !focused {
+                isTriggered = true
+            }
             updateValidationState()
         }
     }
@@ -117,9 +132,9 @@ public struct CustomTextField: View {
 
     private var shouldShowError: Bool {
         if showErrorOnlyWhenTriggered {
-            return validationState == .invalid && !text.isEmpty
+            return validationState == .invalid
         } else {
-            return !isValid && !text.isEmpty
+            return !isValid
         }
     }
 
@@ -139,19 +154,14 @@ public struct CustomTextField: View {
     }
 
     private func updateValidationState() {
-        // Don't override invalid state if showErrorOnlyWhenTriggered is true
-        if showErrorOnlyWhenTriggered && validationState == .invalid {
-            return
-        }
-
         if isFocused {
             validationState = .focused
-        } else if text.isEmpty {
+        } else if !isTriggered {
             validationState = .neutral
+        } else if !isValid {
+            validationState = .invalid
         } else if isValid {
             validationState = .valid
-        } else if !showErrorOnlyWhenTriggered {
-            validationState = .invalid
         } else {
             validationState = .neutral
         }

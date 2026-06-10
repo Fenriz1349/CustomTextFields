@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "CustomTextFields",
     platforms: [
-           .iOS(.v15), 
+           .iOS(.v17),
            .macOS(.v12)
        ],
     products: [

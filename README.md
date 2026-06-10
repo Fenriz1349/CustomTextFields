@@ -1,9 +1,9 @@
 ![Swift](https://img.shields.io/badge/Swift-5.5+-FA7343?style=for-the-badge&logo=swift&logoColor=white)
-![iOS](https://img.shields.io/badge/iOS-15.0+-000000?style=for-the-badge&logo=apple&logoColor=white)
+![iOS](https://img.shields.io/badge/iOS-17.0+-000000?style=for-the-badge&logo=apple&logoColor=white)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-0071E3?style=for-the-badge&logo=swift&logoColor=white)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-FA7343?style=for-the-badge&logo=swift&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
-![Version](https://img.shields.io/badge/Version-1.1.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.2.0-blue?style=for-the-badge)
 
 # CustomTextField
 
@@ -36,7 +36,7 @@ Or add it to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/CustomTextField", from: "1.1.0")
+    .package(url: "https://github.com/yourusername/CustomTextField", from: "1.2.0")
 ]
 ```
 
@@ -357,7 +357,7 @@ CustomTextField.resetValidation(for: $emailState)
 
 ## Requirements
 
-- iOS 15.0+
+- iOS 17.0+
 - macOS 12.0+
 - Swift 5.5+
 - Xcode 13.0+
@@ -396,6 +396,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Fenriz1349**
 
 ## Changelog
+
+### Version 1.2.0 ✨
+- **IMPROVED**: Validation state logic now correctly shows error messages for empty required fields
+- **IMPROVED**: Fields marked as `.invalid` remain in that state after being triggered (focus loss/submit), preventing regression to `.neutral`
+- **NEW**: Added `textContentType` support for autofill and appropriate keyboard selection (email, password fields)
+- **NEW**: iOS 17+ support with updated `onChange(of:)` syntax
+- **NEW**: Comprehensive documentation comments for public API
+- **IMPROVED**: Internal `isTriggered` state to distinguish untouched fields from invalid ones
 
 ### Version 1.1.0 ✨
 - **NEW**: Advanced validation state management with `.neutral`, `.valid`, `.invalid`, and `.focused` states
