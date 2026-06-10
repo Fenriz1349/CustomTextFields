@@ -207,7 +207,7 @@ final class CustomTextFieldTests: XCTestCase {
     // MARK: - Edge Cases
     @MainActor func testEmptyTextHandling() {
         textValue = ""
-        
+
         let textField = CustomTextField(
             placeholder: "Test",
             text: textBinding,

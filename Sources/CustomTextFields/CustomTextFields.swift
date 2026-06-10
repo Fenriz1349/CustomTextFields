@@ -34,6 +34,17 @@ public struct CustomTextField: View {
     @FocusState private var isFocused: Bool
 
     // MARK: - Initializer
+    /// Initializes a CustomTextField with full configuration options.
+    /// - Parameters:
+    ///   - header: Optional header text displayed above the field
+    ///   - placeholder: Placeholder text shown when field is empty
+    ///   - text: Binding to the text value
+    ///   - type: Type of text field (email, password, decimal, etc.)
+    ///   - validator: Optional custom validation closure; uses type-based validation if nil
+    ///   - errorMessage: Error message displayed when validation fails
+    ///   - validationState: Binding to control validation state externally
+    ///   - colors: Color scheme for validation states (default: gray/green/red/blue)
+    ///   - showErrorOnlyWhenTriggered: If true, errors shown only after user interaction
     public init(
         header: String? = nil,
         placeholder: String,
@@ -70,6 +81,7 @@ public struct CustomTextField: View {
     }
 
     // MARK: - View Components
+    /// Renders optional header text above the text field.
     @ViewBuilder
     private var headerView: some View {
         if let header = header {
@@ -78,14 +90,15 @@ public struct CustomTextField: View {
         }
     }
 
+    /// Builds the styled text input field with validation state styling and keyboard configuration.
+    /// - Parameter config: Configuration containing keyboard type and security settings
+    /// - Returns: A styled Group containing TextField or SecureField with modifiers
     private func textFieldView(config: TextFieldConfig) -> some View {
         Group {
             if config.isSecure {
                 SecureField(placeholder, text: $text)
-                    .textContentType(config.textContentType)
             } else {
                 TextField(placeholder, text: $text)
-                    .textContentType(config.textContentType)
             }
         }
         .padding()
@@ -111,6 +124,7 @@ public struct CustomTextField: View {
         }
     }
 
+    /// Renders error message text when validation fails and conditions are met.
     @ViewBuilder
     private var errorMessageView: some View {
         if shouldShowError, let errorMessage = errorMessage {
@@ -122,6 +136,8 @@ public struct CustomTextField: View {
     }
 
     // MARK: - Computed Properties
+    /// Determines the border color based on focus state and validation state.
+    /// - Returns: Focused color if field is focused, validation color otherwise (50% opacity for neutral)
     private var borderColor: Color {
         if isFocused {
             return colors.focused
@@ -130,6 +146,8 @@ public struct CustomTextField: View {
         return colors.color(for: validationState).opacity(validationState == .neutral ? 0.5 : 1.0)
     }
 
+    /// Determines whether to display the error message based on validation mode and state.
+    /// - Returns: True if field is invalid (triggered or immediate mode); false otherwise
     private var shouldShowError: Bool {
         if showErrorOnlyWhenTriggered {
             return validationState == .invalid
@@ -139,6 +157,8 @@ public struct CustomTextField: View {
     }
 
     // MARK: - Private Methods
+    /// Validates input and updates validation state with animation.
+    /// - Parameter input: The text to validate
     private func validateInput(_ input: String) {
         withAnimation(.easeInOut(duration: 0.2)) {
             isValid = performValidation(for: input)
@@ -146,6 +166,9 @@ public struct CustomTextField: View {
         }
     }
 
+    /// Performs validation using custom validator or type-specific default rules.
+    /// - Parameter input: The text to validate
+    /// - Returns: True if valid, false otherwise
     private func performValidation(for input: String) -> Bool {
         if let customValidator = validator {
             return customValidator(input)
@@ -153,6 +176,8 @@ public struct CustomTextField: View {
         return defaultValidation(for: input)
     }
 
+    /// Updates the validation state based on focus, trigger status, and validation result.
+    /// Prioritizes: focused → untouched → invalid → valid → neutral
     private func updateValidationState() {
         if isFocused {
             validationState = .focused
@@ -167,6 +192,9 @@ public struct CustomTextField: View {
         }
     }
 
+    /// Applies type-specific default validation rules (email format, password strength, etc.).
+    /// - Parameter input: The text to validate
+    /// - Returns: True if input matches type requirements, false otherwise
     private func defaultValidation(for input: String) -> Bool {
         switch type {
         case .email:
